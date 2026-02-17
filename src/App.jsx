@@ -5,7 +5,7 @@ function App() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
   const loadTasks = () => {
-    fetch('http://localhost:8080/api/tasks')
+    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks')
       .then(response => response.json())
       .then(data => setTasks(data))
       .catch(error => console.error("Error fetching:", error));
