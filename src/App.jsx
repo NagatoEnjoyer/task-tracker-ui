@@ -19,7 +19,7 @@ function App() {
     e.preventDefault(); 
     const newTask = { title: newTaskTitle, description: "Added from UI!", status: "PENDING" };
 
-    fetch('http://localhost:8080/api/tasks', {
+    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTask) 
@@ -36,7 +36,7 @@ function App() {
     const updatedTask = { ...task, status: "COMPLETED" };
 
     // Notice we add the task.id to the end of the URL!
-    fetch(`http://localhost:8080/api/tasks/${task.id}`, {
+    fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${task.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedTask)
@@ -46,7 +46,7 @@ function App() {
 
   // --- NEW: Delete Task (DELETE) ---
   const handleDeleteTask = (id) => {
-    fetch(`http://localhost:8080/api/tasks/${id}`, {
+    fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${id}`, {
       method: 'DELETE'
     })
     .then(() => loadTasks()); // Reload the list to remove it from the screen
