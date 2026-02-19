@@ -30,31 +30,30 @@ function App() {
     });
   };
 
-  // --- NEW: Update Task (PUT) ---
+  
   const handleCompleteTask = (task) => {
-    // We copy the task, but change its status to COMPLETED
+    
     const updatedTask = { ...task, status: "COMPLETED" };
 
-    // Notice we add the task.id to the end of the URL!
+    
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${task.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedTask)
     })
-    .then(() => loadTasks()); // Reload the list to show the new status
+    .then(() => loadTasks()); 
   };
 
-  // --- NEW: Delete Task (DELETE) ---
   const handleDeleteTask = (id) => {
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${id}`, {
       method: 'DELETE'
     })
-    .then(() => loadTasks()); // Reload the list to remove it from the screen
+    .then(() => loadTasks()); 
   };
 
   return (
     <div style={{ padding: "40px", fontFamily: "sans-serif", maxWidth: "600px", margin: "0 auto" }}>
-      <h2>📝 Task Tracker</h2>
+      <h2>Task Tracker</h2>
       
       <form onSubmit={handleAddTask} style={{ marginBottom: "20px" }}>
         <input 
