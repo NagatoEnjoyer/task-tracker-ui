@@ -1,27 +1,59 @@
 import { useState, useEffect } from 'react';
+import Auth from './Auth';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
+  useEffect(() => {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const loadTasks = () => {
-    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks')
-      .then(response => response.json())
+    const token = localStorage.getItem('jwt_token'); 
+
+    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            handleLogout();
+          }
+          throw new Error("Unauthorized or server error");
+        }
+        return response.json();
+      })
       .then(data => setTasks(data))
       .catch(error => console.error("Error fetching:", error));
   };
 
   useEffect(() => {
-    loadTasks();
-  }, []); 
+    if (isAuthenticated) {
+      loadTasks();
+    }
+  }, [isAuthenticated]); 
 
   const handleAddTask = (e) => {
     e.preventDefault(); 
+    const token = localStorage.getItem('jwt_token');
     const newTask = { title: newTaskTitle, description: "Added from UI!", status: "PENDING" };
 
     fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(newTask) 
     })
     .then(() => {
@@ -30,32 +62,57 @@ function App() {
     });
   };
 
-  
   const handleCompleteTask = (task) => {
-    
+    const token = localStorage.getItem('jwt_token');
     const updatedTask = { ...task, status: "COMPLETED" };
 
-    
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${task.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(updatedTask)
     })
     .then(() => loadTasks()); 
   };
 
   const handleDeleteTask = (id) => {
+    const token = localStorage.getItem('jwt_token');
+
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
     .then(() => loadTasks()); 
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('jwt_token');
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <Auth onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div style={{ padding: "40px", fontFamily: "sans-serif", maxWidth: "600px", margin: "0 auto" }}>
-      <h2>Task Tracker</h2>
       
-      <form onSubmit={handleAddTask} style={{ marginBottom: "20px" }}>
+      {/* Header with Logout Button */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Task Tracker</h2>
+        <button 
+          onClick={handleLogout}
+          style={{ padding: "8px 16px", backgroundColor: "#ff4d4d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+        >
+          Log Out
+        </button>
+      </div>
+      
+      <form onSubmit={handleAddTask} style={{ marginBottom: "20px", marginTop: "20px" }}>
         <input 
           type="text" 
           value={newTaskTitle}
@@ -82,7 +139,6 @@ function App() {
               backgroundColor: task.status === "COMPLETED" ? "#f9f9f9" : "white"
             }}>
               
-              {/* If task is completed, draw a line through the text */}
               <strong style={{ 
                 textDecoration: task.status === "COMPLETED" ? "line-through" : "none",
                 color: task.status === "COMPLETED" ? "gray" : "black"
@@ -90,7 +146,6 @@ function App() {
                 {task.title}
               </strong> 
               
-              {/* Action Buttons */}
               <div style={{ marginTop: "10px" }}>
                 {task.status === "PENDING" && (
                   <button 
