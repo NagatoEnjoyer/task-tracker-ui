@@ -11,7 +11,7 @@ export default function Auth({ onLoginSuccess }) {
         setMessage('');
 
         const endpoint = isLogin ? '/login' : '/register';
-        const url = `http://localhost:8080/api/auth${endpoint}`; 
+        const url = `https://task-tracker-api-ragt.onrender.com/api/auth${endpoint}`; 
 
         try {
             const response = await fetch(url, {
