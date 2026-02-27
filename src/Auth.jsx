@@ -41,7 +41,15 @@ export default function Auth({ onLoginSuccess }) {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: 'auto', textAlign: 'center' }}>
+        <div style={{
+            maxWidth: '400px',
+            margin: 'auto',
+            textAlign: 'center',
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+        }}>
             <h2>{isLogin ? 'Log In' : 'Register'}</h2>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
