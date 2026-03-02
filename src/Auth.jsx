@@ -16,6 +16,7 @@ export default function Auth({ onLoginSuccess }) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
+                include: 'credentials',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
@@ -28,7 +29,6 @@ export default function Auth({ onLoginSuccess }) {
             }
 
             if (isLogin) {
-                localStorage.setItem('jwt_token', data);
                 onLoginSuccess();
             } else {
                 setMessage('Registered successfully! You can now log in.');
