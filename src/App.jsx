@@ -3,56 +3,42 @@ import Auth from './Auth';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt_token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    loadTasks();
   }, []);
 
   const loadTasks = () => {
-    const token = localStorage.getItem('jwt_token'); 
-
     fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
       method: 'GET',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
       .then(response => {
         if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            handleLogout();
-          }
-          throw new Error("Unauthorized or server error");
+          setIsAuthenticated(false);
+          throw new Error("Unauthorized");
         }
+        setIsAuthenticated(true);
         return response.json();
       })
       .then(data => setTasks(data))
       .catch(error => console.error("Error fetching:", error));
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadTasks();
-    }
-  }, [isAuthenticated]); 
-
   const handleAddTask = (e) => {
     e.preventDefault(); 
-    const token = localStorage.getItem('jwt_token');
     const newTask = { title: newTaskTitle, description: "Added from UI!", status: "PENDING" };
 
     fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
       method: 'POST',
+      credentials: 'include',
       headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(newTask) 
     })
@@ -63,14 +49,13 @@ function App() {
   };
 
   const handleCompleteTask = (task) => {
-    const token = localStorage.getItem('jwt_token');
     const updatedTask = { ...task, status: "COMPLETED" };
 
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${task.id}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(updatedTask)
     })
@@ -78,24 +63,20 @@ function App() {
   };
 
   const handleDeleteTask = (id) => {
-    const token = localStorage.getItem('jwt_token');
-
     fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include'
     })
     .then(() => loadTasks()); 
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt_token');
     setIsAuthenticated(false);
+    setTasks([]);
   };
 
   if (!isAuthenticated) {
-    return <Auth onLoginSuccess={() => setIsAuthenticated(true)} />;
+    return <Auth onLoginSuccess={() => loadTasks()} />;
   }
 
   return (
