@@ -5,6 +5,7 @@ export default function Auth({ onLoginSuccess }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [email, setEmail] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,13 +13,14 @@ export default function Auth({ onLoginSuccess }) {
 
         const endpoint = isLogin ? '/login' : '/register';
         const url = `/api/auth${endpoint}`; 
+        const payload = isLogin ? { username, password } : { username, email, password };
 
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 include: 'credentials',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify(payload)
             });
 
             const data = await response.text();
@@ -53,6 +55,16 @@ export default function Auth({ onLoginSuccess }) {
             <h2>{isLogin ? 'Log In' : 'Register'}</h2>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                { !isLogin && (
+                    <input 
+                        type="email" 
+                        placeholder="Email Adress" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        required 
+                    />
+                )}
+                
                 <input 
                     type="text" 
                     placeholder="Username" 
