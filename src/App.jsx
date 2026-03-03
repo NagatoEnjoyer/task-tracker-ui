@@ -11,7 +11,7 @@ function App() {
   }, []);
 
   const loadTasks = () => {
-    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
+    fetch('/api/tasks', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -34,7 +34,7 @@ function App() {
     e.preventDefault(); 
     const newTask = { title: newTaskTitle, description: "Added from UI!", status: "PENDING" };
 
-    fetch('https://task-tracker-api-ragt.onrender.com/api/tasks', {
+    fetch('/api/tasks', {
       method: 'POST',
       credentials: 'include',
       headers: { 
@@ -51,7 +51,7 @@ function App() {
   const handleCompleteTask = (task) => {
     const updatedTask = { ...task, status: "COMPLETED" };
 
-    fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${task.id}`, {
+    fetch(`/api/tasks/${task.id}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 
@@ -63,7 +63,7 @@ function App() {
   };
 
   const handleDeleteTask = (id) => {
-    fetch(`https://task-tracker-api-ragt.onrender.com/api/tasks/${id}`, {
+    fetch(`/api/tasks/${id}`, {
       method: 'DELETE',
       credentials: 'include'
     })
